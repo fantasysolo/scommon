@@ -28,7 +28,7 @@ public:
         bool start = DEFAULT_START);
     ~UdpClient();
     int Start();
-    int SendBlock(const MsgType& msg);
+    int SendSync(const MsgType& msg);
     int Send(const MsgType& msg);
     void Stop();
 private:
@@ -77,13 +77,13 @@ void UdpClient<MsgType>::Thread()
             });
         if (!ready || !run)
             continue;
-        SendBlock(msgs.front());
+        SendSync(msgs.front());
         msgs.pop();
     }
 }
 
 template<class MsgType>
-int UdpClient<MsgType>::SendBlock(const MsgType& msg)
+int UdpClient<MsgType>::SendSync(const MsgType& msg)
 {
     std::lock_guard<std::recursive_mutex> lck(mtx);
     int size = sizeof(msg);
@@ -128,5 +128,5 @@ void UdpClient<MsgType>::Stop()
 #undef DEFAULT_PORT
 #undef DEFAULT_BUFLEN
 #undef DEFAULT_START
-#undef DEFAULT_PERIOD
+#undef DEFAULT_SLEEP_SEC
 #endif
